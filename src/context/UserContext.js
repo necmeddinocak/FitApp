@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeUser, getUserId } from '../utils/deviceId';
 import { supabase } from '../config/supabase';
 
@@ -78,6 +79,27 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      // AsyncStorage'daki kullanıcı bilgilerini temizle
+      await AsyncStorage.removeItem('@fitness_user_id');
+      await AsyncStorage.removeItem('@fitness_device_id');
+      
+      // State'i sıfırla
+      setUserId(null);
+      setUserData(null);
+      setError(null);
+      
+      console.log('✅ Çıkış yapıldı, yeni kullanıcı oluşturuluyor...');
+      
+      // Yeni kullanıcı oluştur
+      await initUser();
+    } catch (err) {
+      console.error('Logout error:', err);
+      throw err;
+    }
+  };
+
   const value = {
     userId,
     userData,
@@ -85,6 +107,7 @@ export const UserProvider = ({ children }) => {
     error,
     updateUserData,
     refreshUserData,
+    logout,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -29,7 +29,7 @@ const ACHIEVEMENT_COLORS = {
 };
 
 export const ProfileScreen = () => {
-  const { userId } = useUser();
+  const { userId, logout } = useUser();
 
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -166,10 +166,22 @@ export const ProfileScreen = () => {
   const handleLogout = () => {
     Alert.alert(
       'Çıkış Yap',
-      'Çıkış yapmak istediğinize emin misiniz?',
+      'Çıkış yapmak istediğinize emin misiniz? Tüm verileriniz cihazdan silinecek ve yeni bir hesap oluşturulacaktır.',
       [
         { text: 'İptal', style: 'cancel' },
-        { text: 'Çıkış Yap', style: 'destructive', onPress: () => console.log('Logout') },
+        { 
+          text: 'Çıkış Yap', 
+          style: 'destructive', 
+          onPress: async () => {
+            try {
+              await logout();
+              Alert.alert('✅ Başarılı', 'Çıkış yapıldı. Yeni hesap oluşturuldu.');
+            } catch (error) {
+              console.error('Çıkış hatası:', error);
+              Alert.alert('Hata', 'Çıkış yapılırken bir hata oluştu');
+            }
+          }
+        },
       ]
     );
   };
