@@ -1,12 +1,25 @@
-import mobileAds, {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-  InterstitialAd,
-  AdEventType,
-  RewardedAd,
-  RewardedAdEventType,
-} from 'react-native-google-mobile-ads';
+import { Platform } from 'react-native';
+
+// Native modülleri sadece production build'de import et
+let mobileAds, BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedAd, RewardedAdEventType;
+
+const isExpoGo = __DEV__ && !Platform.select({ native: true, default: false });
+
+if (!isExpoGo) {
+  try {
+    const admob = require('react-native-google-mobile-ads');
+    mobileAds = admob.default;
+    BannerAd = admob.BannerAd;
+    BannerAdSize = admob.BannerAdSize;
+    TestIds = admob.TestIds;
+    InterstitialAd = admob.InterstitialAd;
+    AdEventType = admob.AdEventType;
+    RewardedAd = admob.RewardedAd;
+    RewardedAdEventType = admob.RewardedAdEventType;
+  } catch (e) {
+    console.log('AdMob not available in Expo Go');
+  }
+}
 
 // AdMob Konfigürasyonu
 class AdMobService {
@@ -18,7 +31,7 @@ class AdMobService {
 
   // AdMob'u başlat
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized || !mobileAds) return;
 
     try {
       await mobileAds().initialize();
@@ -31,6 +44,7 @@ class AdMobService {
 
   // Banner Reklam ID'leri (Test ID'leri kullanıyoruz)
   getBannerAdUnitId() {
+    if (!TestIds) return null;
     // Test ID - Gerçek uygulamada kendi AdMob ID'nizi kullanın
     return TestIds.BANNER;
     
@@ -43,12 +57,12 @@ class AdMobService {
 
   // Interstitial Reklam ID'leri
   getInterstitialAdUnitId() {
-    return TestIds.INTERSTITIAL;
+    return TestIds?.INTERSTITIAL || null;
   }
 
   // Rewarded Reklam ID'leri
   getRewardedAdUnitId() {
-    return TestIds.REWARDED;
+    return TestIds?.REWARDED || null;
   }
 
   // Interstitial Reklam Yükle
@@ -144,6 +158,6 @@ class AdMobService {
 // Singleton instance
 export const adMobService = new AdMobService();
 
-// Export edilen bileşenler ve sabitler
-export { BannerAd, BannerAdSize, TestIds };
+// Export edilen bileşenler ve sabitler (Expo Go için null olabilir)
+export { BannerAd, BannerAdSize, TestIds, mobileAds };
 

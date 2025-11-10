@@ -122,7 +122,7 @@ export const HomeScreen = () => {
       </View>
 
       {/* AdMob Banner Reklam */}
-      {Platform.OS !== 'web' && (
+      {Platform.OS !== 'web' && BannerAd && adMobService.getBannerAdUnitId() && (
         <View style={styles.adContainer}>
           <BannerAd
             unitId={adMobService.getBannerAdUnitId()}
