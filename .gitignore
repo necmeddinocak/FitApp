@@ -23,3 +23,9 @@ web-build/
 *.log
 *.tmp
 *.temp
+
+# Android
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
