@@ -1,0 +1,149 @@
+import mobileAds, {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  InterstitialAd,
+  AdEventType,
+  RewardedAd,
+  RewardedAdEventType,
+} from 'react-native-google-mobile-ads';
+
+// AdMob Konfigürasyonu
+class AdMobService {
+  constructor() {
+    this.initialized = false;
+    this.interstitialAd = null;
+    this.rewardedAd = null;
+  }
+
+  // AdMob'u başlat
+  async initialize() {
+    if (this.initialized) return;
+
+    try {
+      await mobileAds().initialize();
+      this.initialized = true;
+      console.log('✅ AdMob başarıyla başlatıldı');
+    } catch (error) {
+      console.error('❌ AdMob başlatma hatası:', error);
+    }
+  }
+
+  // Banner Reklam ID'leri (Test ID'leri kullanıyoruz)
+  getBannerAdUnitId() {
+    // Test ID - Gerçek uygulamada kendi AdMob ID'nizi kullanın
+    return TestIds.BANNER;
+    
+    // Gerçek ID'ler için (AdMob hesabınızdan alın):
+    // return Platform.select({
+    //   ios: 'ca-app-pub-XXXXXXXXXXXXX/YYYYYYYYYY',
+    //   android: 'ca-app-pub-XXXXXXXXXXXXX/YYYYYYYYYY',
+    // });
+  }
+
+  // Interstitial Reklam ID'leri
+  getInterstitialAdUnitId() {
+    return TestIds.INTERSTITIAL;
+  }
+
+  // Rewarded Reklam ID'leri
+  getRewardedAdUnitId() {
+    return TestIds.REWARDED;
+  }
+
+  // Interstitial Reklam Yükle
+  async loadInterstitialAd() {
+    try {
+      this.interstitialAd = InterstitialAd.createForAdRequest(
+        this.getInterstitialAdUnitId()
+      );
+
+      // Reklam yükleme dinleyicileri
+      const unsubscribe = this.interstitialAd.addAdEventListener(
+        AdEventType.LOADED,
+        () => {
+          console.log('✅ Interstitial reklam yüklendi');
+        }
+      );
+
+      await this.interstitialAd.load();
+      return unsubscribe;
+    } catch (error) {
+      console.error('❌ Interstitial reklam yükleme hatası:', error);
+      return null;
+    }
+  }
+
+  // Interstitial Reklam Göster
+  async showInterstitialAd() {
+    if (!this.interstitialAd) {
+      await this.loadInterstitialAd();
+    }
+
+    if (this.interstitialAd) {
+      this.interstitialAd.show();
+    }
+  }
+
+  // Rewarded Reklam Yükle
+  async loadRewardedAd() {
+    try {
+      this.rewardedAd = RewardedAd.createForAdRequest(
+        this.getRewardedAdUnitId()
+      );
+
+      // Ödül dinleyicisi
+      const unsubscribeLoaded = this.rewardedAd.addAdEventListener(
+        RewardedAdEventType.LOADED,
+        () => {
+          console.log('✅ Rewarded reklam yüklendi');
+        }
+      );
+
+      const unsubscribeEarned = this.rewardedAd.addAdEventListener(
+        RewardedAdEventType.EARNED_REWARD,
+        (reward) => {
+          console.log('🎁 Ödül kazanıldı:', reward);
+        }
+      );
+
+      await this.rewardedAd.load();
+      
+      return () => {
+        unsubscribeLoaded();
+        unsubscribeEarned();
+      };
+    } catch (error) {
+      console.error('❌ Rewarded reklam yükleme hatası:', error);
+      return null;
+    }
+  }
+
+  // Rewarded Reklam Göster
+  async showRewardedAd(onRewarded) {
+    if (!this.rewardedAd) {
+      await this.loadRewardedAd();
+    }
+
+    if (this.rewardedAd) {
+      const unsubscribe = this.rewardedAd.addAdEventListener(
+        RewardedAdEventType.EARNED_REWARD,
+        (reward) => {
+          if (onRewarded) {
+            onRewarded(reward);
+          }
+        }
+      );
+
+      this.rewardedAd.show();
+      return unsubscribe;
+    }
+  }
+}
+
+// Singleton instance
+export const adMobService = new AdMobService();
+
+// Export edilen bileşenler ve sabitler
+export { BannerAd, BannerAdSize, TestIds };
+

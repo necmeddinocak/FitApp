@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Text, Button } from '../components/common';
 import { COLORS, SPACING, TYPOGRAPHY } from '../constants/theme';
 import { useUser } from '../context';
-import { workoutService, trackingService, motivationService, userService } from '../services';
+import { workoutService, trackingService, motivationService, userService, BannerAd, BannerAdSize, adMobService } from '../services';
 import { useNavigation } from '@react-navigation/native';
 
 export const HomeScreen = () => {
@@ -120,6 +120,19 @@ export const HomeScreen = () => {
           <Ionicons name="notifications-outline" size={24} color={COLORS.text} />
         </TouchableOpacity>
       </View>
+
+      {/* AdMob Banner Reklam */}
+      {Platform.OS !== 'web' && (
+        <View style={styles.adContainer}>
+          <BannerAd
+            unitId={adMobService.getBannerAdUnitId()}
+            size={BannerAdSize.BANNER}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: true,
+            }}
+          />
+        </View>
+      )}
 
       {/* Günün Hedefi Kartı */}
       {weeklyStats && (
@@ -360,6 +373,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.lg,
     paddingTop: SPACING.xl,
+  },
+  adContainer: {
+    alignItems: 'center',
+    marginVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
+    paddingVertical: SPACING.sm,
   },
   goalCard: {
     marginHorizontal: SPACING.lg,
