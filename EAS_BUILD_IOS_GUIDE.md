@@ -19,9 +19,16 @@ Bu build türü:
 - ✅ AdMob tam çalışır
 - ✅ 15-20 dakikada hazır
 
+**Apple hesabı olmadan (Önerilen):**
 ```bash
 cd "C:\Users\Necmettin OCAK\Desktop\udemykursu1\FitnessApp"
+eas build --platform ios --profile preview --non-interactive
+```
+
+**Apple hesabı ile (Opsiyonel):**
+```bash
 eas build --platform ios --profile preview
+# Komut Apple ID soracaktır
 ```
 
 ### Adım 2: Build Süreci
