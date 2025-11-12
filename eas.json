@@ -18,6 +18,13 @@
         "buildConfiguration": "Release"
       }
     },
+    "preview-device": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false,
+        "buildConfiguration": "Release"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "ios": {
@@ -26,6 +33,13 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {},
+    "preview": {
+      "ios": {
+        "appleId": "necmeddin.ocak@icloud.com",
+        "ascAppId": "auto",
+        "appleTeamId": "auto"
+      }
+    }
   }
 }
